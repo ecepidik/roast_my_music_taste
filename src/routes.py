@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, make_response, current_app
+from flask import Blueprint, request, redirect, url_for, make_response, current_app, jsonify
 import requests
 import base64
 
@@ -9,17 +9,32 @@ def landing_page():
     return redirect(url_for('routes.get_current_song'))
 @bp.route('/songs/current')
 def get_current_song():
+    print("Retrieving current song from Spotify...")
     access_token = request.cookies.get('access_token')
     if not access_token:
         return redirect(url_for('routes.spotify_auth'))
     print("Fetching current song from Spotify...")
     res = requests.get('https://api.spotify.com/v1/me/player/currently-playing',
                         headers={'Authorization': 'Bearer ' + access_token})
-    if res.status_code != 200 or res.json().get("item") is None:
-        return "No song is currently playing.", 200
     
-    data = res.json()
-    return data.get("item").get("name"), 200
+    if res.status_code == 204 or not res.content:
+        return "No song is currently playing.", 200
+    elif res.status_code != 200:
+        return f"Error fetching current song: {res.status_code} - {res.text}", res.status_code
+    else:
+        current = res.json()
+        item = current["item"]
+        track_payload = {
+            "id": item.get("id"),
+            "name": item.get("name"),
+            "artists": [a["name"] for a in item.get("artists", [])],
+            "album": (item.get("album") or {}).get("name"),
+            "explicit": item.get("explicit"),
+            "popularity": item.get("popularity")
+        }
+
+        roast = current_app.config['SONG_ROASTER'].roast_track(track_payload)
+        return jsonify({"track": track_payload, "roast": roast}), 200
 
 @bp.route('/spotify/auth')
 def spotify_auth():

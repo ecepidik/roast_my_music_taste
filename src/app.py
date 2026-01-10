@@ -3,21 +3,22 @@ from flask import Flask
 from .config import spotify_config
 from dotenv import load_dotenv
 from .routes import bp as routes_bp
-
+from .llm_roaster import SongRoaster
 
 def create_app():
     load_dotenv(f'.env.{os.getenv("ENV", "local")}')
-    app = Flask('__name__')
+    app = Flask(__name__)
     app.url_map.strict_slashes = False
 
-    if os.getenv('SPOTIFY_CLIENT') and os.getenv('SPOTIFY_SECRET') and os.getenv('CALLBACK_REDIRECT_URI'):
+    if os.getenv('SPOTIFY_CLIENT') and os.getenv('SPOTIFY_SECRET') and os.getenv('CALLBACK_REDIRECT_URI') and os.getenv('GEMINI_API_KEY'):
         spotify_obj = spotify_config(spotify_secret=os.getenv('SPOTIFY_SECRET'),spotify_client= os.getenv('SPOTIFY_CLIENT'), callback_redirect_uri=os.getenv('CALLBACK_REDIRECT_URI'))
-        
-        app.config['SPOTIFY'] = spotify_obj
+        song_roaster = SongRoaster(api_key=os.getenv('GEMINI_API_KEY'), model="gemini-3-flash-preview")
 
+        app.config['SONG_ROASTER'] = song_roaster
+        app.config['SPOTIFY'] = spotify_obj
         app.register_blueprint(routes_bp)
 
     else:
-        raise RuntimeError("Spotify credentials not provided.")
+        raise RuntimeError("Spotify credentials or Gemini API key not provided.")
     
     return app
