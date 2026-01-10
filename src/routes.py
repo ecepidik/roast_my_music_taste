@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, make_response, current_app as app
+from flask import Blueprint, request, redirect, url_for, make_response, current_app
 import requests
 import base64
 
@@ -24,7 +24,7 @@ def get_current_song():
 @bp.route('/spotify/auth')
 def spotify_auth():
     print("Initiating Spotify authentication...")
-    return redirect(f'https://accounts.spotify.com/authorize?client_id={current_app.config["SPOTIFY"].SPOTIFY_CLIENT}&response_type=code&redirect_uri={app.config["SPOTIFY"].CALLBACK_REDIRECT_URI}&scope=user-read-currently-playing')
+    return redirect(f'https://accounts.spotify.com/authorize?client_id={current_app.config["SPOTIFY"].SPOTIFY_CLIENT}&response_type=code&redirect_uri={current_app.config["SPOTIFY"].CALLBACK_REDIRECT_URI}&scope=user-read-currently-playing')
 
 @bp.route('/spotify/auth/callback')
 def spotify_auth_callback():
