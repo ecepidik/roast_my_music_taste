@@ -2,6 +2,7 @@ import os
 from flask import Flask
 import spotify_config as spotify_config
 from dotenv import load_dotenv
+from .routes import bp as routes_bp
 
 
 def create_app():
@@ -14,7 +15,6 @@ def create_app():
         
         app.config['SPOTIFY'] = spotify_obj
 
-        from routes import bp as routes_bp
         app.register_blueprint(routes_bp)
 
     else:
