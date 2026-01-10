@@ -1,9 +1,12 @@
+import os
 import sys
 from flask import Flask, request, redirect, url_for, make_response
 import requests
 import spotify_config
 import base64
+from dotenv import load_dotenv
 
+load_dotenv(f'.env.{os.getenv("ENV", "local")}')
 app = Flask('__name__')
 app.url_map.strict_slashes = False
 
@@ -54,8 +57,9 @@ def spotify_auth_callback():
 
 
 if __name__ == '__main__':
-    if sys.argv[1] and sys.argv[2]:
-        spotify_obj = spotify_config.spotify_config(sys.argv[1], sys.argv[2])
+    print(os.getenv('ENV'))
+    if os.getenv('SPOTIFY_CLIENT') and os.getenv('SPOTIFY_SECRET'):
+        spotify_obj = spotify_config.spotify_config(os.getenv('SPOTIFY_CLIENT'), os.getenv('SPOTIFY_SECRET'))
         app.config['SPOTIFY'] = spotify_obj
         app.run(debug=True)
 
