@@ -30,8 +30,8 @@ Built as a lightweight experiment combining third-party APIs, prompt design, and
 
 This project was built for fun and learning:
 - Experimenting with LLM prompting and tone control  
-- Integrating multiple external APIs  
-- Shipping a small idea end-to-end, from concept to deployment  
+- Shipping a small idea end-to-end, from concept to deployment
+- Verifying how bad my own music taste is
 
 ---
 
